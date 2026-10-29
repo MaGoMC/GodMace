@@ -1,4 +1,4 @@
-plugins { id 'fabric-loom' version '1.17.+' }
+plugins { id 'net.fabricmc.fabric-loom' version '1.14.10' }
 version = project.mod_version
 group = project.maven_group
 base { archivesName = project.archives_base_name }
