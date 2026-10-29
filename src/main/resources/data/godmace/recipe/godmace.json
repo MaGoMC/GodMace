@@ -1,1 +1,17 @@
-
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TMT",
+    "MEM",
+    "TMT"
+  ],
+  "key": {
+    "T": "minecraft:tnt",
+    "M": "minecraft:mace",
+    "E": "minecraft:elytra"
+  },
+  "result": {
+    "id": "minecraft:mace",
+    "count": 1
+  }
+}
