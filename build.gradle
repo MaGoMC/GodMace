@@ -4,9 +4,9 @@ group = project.maven_group
 base { archivesName = project.archives_base_name }
 repositories { mavenCentral(); maven { url = 'https://maven.fabricmc.net/' } }
 dependencies {
- minecraft "com.mojang:minecraft:${project.minecraft_version}"
- implementation "net.fabricmc:fabric-loader:${project.loader_version}"
- implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 loom { splitEnvironmentSourceSets() }
 java { toolchain { languageVersion = JavaLanguageVersion.of(25) }; withSourcesJar() }
