@@ -1,0 +1,13 @@
+plugins { id 'fabric-loom' version '1.17.+' }
+version = project.mod_version
+group = project.maven_group
+base { archivesName = project.archives_base_name }
+repositories { mavenCentral(); maven { url = 'https://maven.fabricmc.net/' } }
+dependencies {
+ minecraft "com.mojang:minecraft:${project.minecraft_version}"
+ modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+ modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+loom { splitEnvironmentSourceSets() }
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) }; withSourcesJar() }
+tasks.withType(JavaCompile).configureEach { options.release = 25 }

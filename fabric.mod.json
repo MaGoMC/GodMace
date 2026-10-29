@@ -1,0 +1,10 @@
+{
+ "schemaVersion": 1,
+ "id": "godmace",
+ "version": "${version}",
+ "name": "GodMace",
+ "description": "A Fabric recreation of the VideoMace Paper plugin",
+ "environment": "*",
+ "entrypoints": { "main": ["dev.godmace.GodMace"] },
+ "depends": { "fabricloader": ">=0.19.5", "minecraft": "26.2", "java": ">=25", "fabric-api": "*" }
+}
