@@ -12,6 +12,17 @@
   },
   "result": {
     "id": "minecraft:mace",
-    "count": 1
+    "count": 1,
+    "components": {
+      "minecraft:custom_name": {
+        "text": "GOD MACE",
+        "color": "dark_red",
+        "bold": true
+      },
+      "minecraft:custom_data": {
+        "godmace": true,
+        "godmace_kills": 0
+      }
+    }
   }
 }
