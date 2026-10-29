@@ -118,6 +118,7 @@ public final class GodMace implements ModInitializer {
             tickStabs(server);
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 if (ticks % 40 == 0) applyPassiveEffects(player);
+                if (ticks % 20 == 0 && isMace(player.getMainHandItem())) updateMaceLore(player, player.getMainHandItem());
 
             }
         });
@@ -135,9 +136,7 @@ public final class GodMace implements ModInitializer {
             NUKE_CHARGES.merge(id, 2, (oldValue, bonus) -> Math.min(1000000, oldValue + bonus));
             STAB_CHARGES.merge(id, 2, (oldValue, bonus) -> Math.min(1000000, oldValue + bonus));
             upgradeEnchantments(killer, mace, newKills);
-            killer.sendSystemMessage(Component.literal("GOD MACE PvP kills: " + newKills
-                + " | Nukes: " + NUKE_CHARGES.get(id)
-                + " | Stabs: " + STAB_CHARGES.get(id)).withStyle(ChatFormatting.GOLD));
+            updateMaceLore(killer, mace);
         });
         AttackEntityCallback.EVENT.register((player, level, hand, target, hit) -> {
             if (level.isClientSide() || !isMace(player.getItemInHand(hand))) return InteractionResult.PASS;
@@ -182,6 +181,21 @@ public final class GodMace implements ModInitializer {
         stack.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(
             java.util.List.of(Component.literal("Kills: " + Math.max(0, kills)).withStyle(ChatFormatting.DARK_GRAY))));
     }
+    // Charge balances belong to players, so refresh the held mace's tooltip for its holder.
+    private static void updateMaceLore(ServerPlayer player, ItemStack mace) {
+        if (!isMace(mace)) return;
+        UUID id = player.getUUID();
+        int kills = getKills(mace);
+        int nukes = NUKE_CHARGES.getOrDefault(id, 0);
+        int stabs = STAB_CHARGES.getOrDefault(id, 0);
+        int rings = Math.min(20, Math.max(1, kills));
+        mace.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(java.util.List.of(
+            Component.literal("PvP Kills: " + kills).withStyle(ChatFormatting.GRAY),
+            Component.literal("Nukes: " + nukes + " | Stabs: " + stabs).withStyle(ChatFormatting.GOLD),
+            Component.literal("Nuke rings: " + rings + "/20").withStyle(ChatFormatting.DARK_GRAY)
+        )));
+    }
+
     // Rotate mace-compatible upgrades. Density and Breach conflict, so use Density.
     // Standard maximum enchantment levels are respected.
     private static void upgradeEnchantments(ServerPlayer player, ItemStack mace, int kills) {
@@ -245,7 +259,7 @@ public final class GodMace implements ModInitializer {
         ACTIVE_STABS.add(new StabWave(player, target));
         STAB_CHARGES.put(id, STAB_CHARGES.get(id) - 1);
         NEXT_STAB.put(id, ticks + cooldown);
-        player.sendSystemMessage(Component.literal("GOD MACE STAB! Remaining: " + STAB_CHARGES.get(id)).withStyle(ChatFormatting.RED));
+        updateMaceLore(player, player.getMainHandItem());
     }
 
     private static void strike(ServerPlayer player, int kills) {
@@ -263,6 +277,6 @@ public final class GodMace implements ModInitializer {
         }
         NUKE_CHARGES.put(id, NUKE_CHARGES.get(id) - 1);
         NEXT_STRIKE.put(id, ticks + 20);
-        player.sendSystemMessage(Component.literal("OrbitalStrike+ nuke! Rings: " + rings + " | Charges: " + NUKE_CHARGES.get(id)).withStyle(ChatFormatting.GOLD));
+        updateMaceLore(player, player.getMainHandItem());
     }
 }
