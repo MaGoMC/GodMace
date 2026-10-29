@@ -104,7 +104,10 @@ public final class GodMace implements ModInitializer {
             if (!isMace(stack)) return InteractionResult.PASS;
             if (level.isClientSide()) return InteractionResult.SUCCESS;
             if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
-            if (player.isShiftKeyDown()) stab(serverPlayer, getKills(stack));
+            if (player.isShiftKeyDown()) {
+    serverPlayer.sendSystemMessage(Component.literal("SHIFT DETECTED!"));
+    stab(serverPlayer, getKills(stack));
+}
             else strike(serverPlayer, getKills(stack));
             return InteractionResult.SUCCESS;
         });
