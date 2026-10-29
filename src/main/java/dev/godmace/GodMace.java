@@ -133,12 +133,15 @@ public final class GodMace implements ModInitializer {
         stack.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(
             java.util.List.of(Component.literal("Kills: " + Math.max(0, kills)).withStyle(ChatFormatting.DARK_GRAY))));
     }
-    // Density is a mace-specific enchantment. Its level rises on every PvP kill.
-    // Levels beyond vanilla's normal maximum are intentionally allowed for GodMace.
+    // Rotate mace-compatible upgrades. Density and Breach conflict, so use Density.
+    // Standard maximum enchantment levels are respected.
     private static void upgradeEnchantments(ServerPlayer player, ItemStack mace, int kills) {
         var enchantments = player.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-        var density = enchantments.getOrThrow(Enchantments.DENSITY);
-        mace.enchant(density, Math.max(1, kills));
+        int stage = (kills - 1) % 4;
+        if (stage == 0) mace.enchant(enchantments.getOrThrow(Enchantments.DENSITY), Math.min(5, (kills + 3) / 4));
+        else if (stage == 1) mace.enchant(enchantments.getOrThrow(Enchantments.UNBREAKING), Math.min(3, (kills + 2) / 4));
+        else if (stage == 2) mace.enchant(enchantments.getOrThrow(Enchantments.WIND_BURST), Math.min(3, (kills + 1) / 4));
+        else mace.enchant(enchantments.getOrThrow(Enchantments.MENDING), 1);
     }
 
     private static void applyPassiveEffects(ServerPlayer player) {
@@ -183,7 +186,12 @@ public final class GodMace implements ModInitializer {
     private static void stab(ServerPlayer player, int kills) {
         UUID id = player.getUUID();
         long cooldown = kills >= 10 ? 200 : kills >= 7 ? 300 : kills >= 3 ? 600 : 1200;
-        if (NEXT_STAB.getOrDefault(id, 0L) > ticks || STAB_CHARGES.getOrDefault(id, 0) <= 0) return;
+        if (NEXT_STAB.getOrDefault(id, 0L) > ticks) {
+            player.sendSystemMessage(Component.literal("Stab cooling down").withStyle(ChatFormatting.RED)); return;
+        }
+        if (STAB_CHARGES.getOrDefault(id, 0) <= 0) {
+            player.sendSystemMessage(Component.literal("No stab charges: earn 2 per PvP kill").withStyle(ChatFormatting.RED)); return;
+        }
         Vec3 target = aimedPosition(player);
         if (!callOrbital("summonStab", player.level(),
                 (int)Math.floor(target.x), (int)Math.floor(target.z))) {
@@ -197,11 +205,14 @@ public final class GodMace implements ModInitializer {
 
     private static void strike(ServerPlayer player, int kills) {
         UUID id = player.getUUID();
-        if (NEXT_STRIKE.getOrDefault(id, 0L) > ticks || NUKE_CHARGES.getOrDefault(id, 0) <= 0) return;
+        if (NEXT_STRIKE.getOrDefault(id, 0L) > ticks) return;
+        if (NUKE_CHARGES.getOrDefault(id, 0) <= 0) {
+            player.sendSystemMessage(Component.literal("No nuke charges: earn 2 per PvP kill").withStyle(ChatFormatting.RED)); return;
+        }
         Vec3 target = aimedPosition(player);
         int rings = Math.min(20, Math.max(1, kills));
         if (!callOrbital("summonNuke", player.level(),
-                (int)Math.floor(target.x), (int)Math.floor(target.y), (int)Math.floor(target.z), rings)) {
+                (int)Math.floor(target.x), (int)Math.min(player.level().getMaxY() - 8, Math.floor(target.y) + 40), (int)Math.floor(target.z), rings)) {
             player.sendSystemMessage(Component.literal("OrbitalStrike+ is missing or incompatible!").withStyle(ChatFormatting.RED));
             return;
         }
