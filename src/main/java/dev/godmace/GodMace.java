@@ -134,9 +134,9 @@ public final class GodMace implements ModInitializer {
         }
         if (isMace(player.getMainHandItem())) maxKills = Math.max(maxKills, getKills(player.getMainHandItem()));
         if (maxKills == 0) return;
-        if (maxKills >= 3) player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 0, true, false));
-        if (maxKills >= 5) player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 0, true, false));
-        if (maxKills >= 7) player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 0, true, false));
+        if (maxKills >= 3) player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 0, true, false));
+        if (maxKills >= 5) player.addEffect(new MobEffectInstance(MobEffects.SPEED, 100, 0, true, false));
+        if (maxKills >= 7) player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 100, 0, true, false));
         if (maxKills >= 10) player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0, true, false));
     }
     private static void stab(ServerPlayer player, int kills) {
